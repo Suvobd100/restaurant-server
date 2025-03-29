@@ -23,6 +23,20 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+
+    const db = client.db('restaurantDB')
+    const foodsCollection = db.collection('foods')
+    const usersCollection = db.collection('users')
+
+
+ // get all foods data from db
+ app.get('/foods', async (req, res) => {
+    const result = await foodsCollection.find().toArray()
+    res.send(result)
+  })
+
+
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(
@@ -34,7 +48,7 @@ async function run() {
 }
 run().catch(console.dir)
 app.get('/', (req, res) => {
-  res.send('Hello from SoloSphere Server....')
+  res.send('Hello from Restaurant Management Server....')
 })
 
 app.listen(port, () => console.log(`Server running on port ${port}`))
