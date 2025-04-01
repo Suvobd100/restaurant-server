@@ -33,14 +33,29 @@ async function run() {
       res.send(result);
     });
 
-    // get a single food data by _id from db
-    app.get('/food/:id', async (req, res) => {
-        const id = req.params.id
-        console.log(id);
-        const query = { _id: new ObjectId(id) }
-        const result = await foodsCollection.findOne(query)
-        res.send(result)
-      })
+    // Get single food by ID
+    app.get("/food/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        console.log("Received ID:", id, "Type:", typeof id);
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send("Invalid ID format");
+        }
+
+        const query = { _id: new ObjectId(id) };
+        const result = await foodsCollection.findOne(query);
+
+        if (!result) {
+          return res.status(404).send("Food not found");
+        }
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching food:", error);
+        res.status(500).send("Internal server error");
+      }
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
