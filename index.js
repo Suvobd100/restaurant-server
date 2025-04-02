@@ -33,7 +33,7 @@ async function run() {
       res.send(result);
     });
 
-    // Get single food by ID
+    // get single food by ID
     app.get("/food/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -56,6 +56,23 @@ async function run() {
         res.status(500).send("Internal server error");
       }
     });
+
+
+    // // save a foodData in db
+    // app.post('/add-food', async (req, res) => {
+    //     const foodData = req.body
+    //     const result = await foodsCollection.insertOne(foodData)
+    //     console.log(result)
+    //     res.send(result)
+    //   })
+
+    // save a userData in db
+    app.post('/user-food', async (req, res) => {
+        const userfoodData = req.body
+        const result = await usersCollection.insertOne(userfoodData)
+        // console.log(result)
+        res.send(result)
+      })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
