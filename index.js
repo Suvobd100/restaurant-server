@@ -103,6 +103,29 @@ async function run() {
       }
     });
 
+    //  Add food item for a specific user
+    app.post("/foods/user/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const foodData = req.body;
+
+        // Verify the email matches the addBy.email
+        if (email !== foodData.addBy.email) {
+          return res.status(403).json({ message: "Email mismatch" });
+        }
+
+        const result = await usersCollection.insertOne(foodData);
+        // console.log(result);
+        res.status(201).json({
+          message: "Food item added successfully",
+          insertedId: result.insertedId
+        });
+      } catch (error) {
+        console.error("Error adding food item:", error);
+        res.status(500).json({ message: "Failed to add food item" });
+      }
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
