@@ -37,7 +37,7 @@ async function run() {
     app.get("/food/:id", async (req, res) => {
       try {
         const id = req.params.id;
-        console.log("Received ID:", id, "Type:", typeof id);
+        // console.log("Received ID:", id, "Type:", typeof id);
 
         if (!ObjectId.isValid(id)) {
           return res.status(400).send("Invalid ID format");
@@ -58,21 +58,25 @@ async function run() {
     });
 
 
-    // // save a foodData in db
-    // app.post('/add-food', async (req, res) => {
-    //     const foodData = req.body
-    //     const result = await foodsCollection.insertOne(foodData)
-    //     console.log(result)
-    //     res.send(result)
-    //   })
-
     // save a userData in db
-    app.post('/user-food', async (req, res) => {
-        const userfoodData = req.body
-        const result = await usersCollection.insertOne(userfoodData)
-        // console.log(result)
-        res.send(result)
-      })
+    app.post("/user-food", async (req, res) => {
+      const userfoodData = req.body;
+      const result = await usersCollection.insertOne(userfoodData);
+      // console.log(result)
+      res.send(result);
+    });
+
+    // get all foods posted by a specific user
+    app.get("/foods/user/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log("email from params-->", email);
+     
+      const query = { BuyerEmail: email };
+      const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
