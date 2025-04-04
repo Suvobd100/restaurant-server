@@ -57,7 +57,6 @@ async function run() {
       }
     });
 
-
     // save a userData in db
     app.post("/user-food", async (req, res) => {
       const userfoodData = req.body;
@@ -70,13 +69,39 @@ async function run() {
     app.get("/foods/user/:email", async (req, res) => {
       const email = req.params.email;
       console.log("email from params-->", email);
-     
+
       const query = { BuyerEmail: email };
       const result = await usersCollection.find(query).toArray();
       res.send(result);
     });
 
-    
+    // update(put) route for specific user food
+    app.put("/foods/user/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updatedFood = req.body;
+        console.log("Updating food with ID:", id, "Data:", updatedFood);
+
+        // Exclude _id from the update by specifying only editable fields
+        const result = await usersCollection.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+            //   foodName: updatedFood.foodName,
+              BuyingQuantity: updatedFood.BuyingQuantity,
+            },
+          }
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({ message: "Food item not found" });
+        }
+        res.send({ message: "Update successful", result });
+      } catch (error) {
+        console.error("Error updating food:", error);
+        res.status(500).send({ message: "Internal server error" });
+      }
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
