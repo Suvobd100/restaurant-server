@@ -10,9 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8qsyw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@main.yolij.mongodb.net/?retryWrites=true&w=majority&appName=Main`
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -68,10 +66,11 @@ async function run() {
     // get all foods posted by a specific user
     app.get("/foods/user/:email", async (req, res) => {
       const email = req.params.email;
-      console.log("email from params-->", email);
+    //   console.log("email from params-->", email);
 
-      const query = { BuyerEmail: email };
+      const query = { buyerEmail: email };
       const result = await usersCollection.find(query).toArray();
+      console.log(result);
       res.send(result);
     });
 
@@ -82,12 +81,12 @@ async function run() {
         const updatedFood = req.body;
         console.log("Updating food with ID:", id, "Data:", updatedFood);
 
-        // Exclude _id from the update by specifying only editable fields
+        
         const result = await usersCollection.updateOne(
           { _id: new ObjectId(id) },
           {
             $set: {
-            //   foodName: updatedFood.foodName,
+            
               BuyingQuantity: updatedFood.BuyingQuantity,
             },
           }
@@ -108,12 +107,9 @@ async function run() {
       try {
         const email = req.params.email;
         const foodData = req.body;
+        console.log(foodData);
 
-        // Verify the email matches the addBy.email
-        if (email !== foodData.addBy.email) {
-          return res.status(403).json({ message: "Email mismatch" });
-        }
-
+        
         const result = await usersCollection.insertOne(foodData);
         // console.log(result);
         res.status(201).json({
@@ -125,6 +121,44 @@ async function run() {
         res.status(500).json({ message: "Failed to add food item" });
       }
     });
+
+   
+    // DELETE endpoint for removing food items
+    app.delete("/foods/:id", async (req, res) => {
+        try {
+          const { id } = req.params;
+          console.log("Attempting to delete food with ID:", id);
+      
+              
+          const result = await usersCollection.deleteOne({ 
+            _id: new ObjectId(id) 
+          });
+          
+          console.log("Delete operation result:", result);
+      
+          if (result.deletedCount === 0) {
+            console.log("No document found with ID:", id);
+            return res.status(404).json({
+              success: false,
+              message: "Food item not found"
+            });
+          }
+      
+          res.status(200).json({
+            success: true,
+            message: "Food item deleted successfully"
+          });
+      
+        } catch (error) {
+          console.error("Full delete error:", error);
+          res.status(500).json({
+            success: false,
+            message: "Failed to delete food item",
+            
+          });
+        }
+      });
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
