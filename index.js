@@ -1,11 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+
 require("dotenv").config();
 
 const port = process.env.PORT || 8000;
 const app = express();
 
+// middleware
 app.use(cors());
 app.use(express.json());
 
@@ -50,7 +52,7 @@ async function run() {
 
         res.send(result);
       } catch (error) {
-        console.error("Error fetching food:", error);
+        // console.error("Error fetching food:", error);
         res.status(500).send("Internal server error");
       }
     });
@@ -70,7 +72,7 @@ async function run() {
 
       const query = { buyerEmail: email };
       const result = await usersCollection.find(query).toArray();
-      console.log(result);
+    //   console.log(result);
       res.send(result);
     });
 
@@ -79,7 +81,7 @@ async function run() {
       try {
         const id = req.params.id;
         const updatedFood = req.body;
-        console.log("Updating food with ID:", id, "Data:", updatedFood);
+        // console.log("Updating food with ID:", id, "Data:", updatedFood);
 
         
         const result = await usersCollection.updateOne(
@@ -97,7 +99,7 @@ async function run() {
         }
         res.send({ message: "Update successful", result });
       } catch (error) {
-        console.error("Error updating food:", error);
+        // console.error("Error updating food:", error);
         res.status(500).send({ message: "Internal server error" });
       }
     });
@@ -107,7 +109,7 @@ async function run() {
       try {
         const email = req.params.email;
         const foodData = req.body;
-        console.log(foodData);
+        // console.log(foodData);
 
         
         const result = await usersCollection.insertOne(foodData);
@@ -117,7 +119,7 @@ async function run() {
           insertedId: result.insertedId
         });
       } catch (error) {
-        console.error("Error adding food item:", error);
+        // console.error("Error adding food item:", error);
         res.status(500).json({ message: "Failed to add food item" });
       }
     });
@@ -127,17 +129,17 @@ async function run() {
     app.delete("/foods/:id", async (req, res) => {
         try {
           const { id } = req.params;
-          console.log("Attempting to delete food with ID:", id);
+        //   console.log("Attempting to delete food with ID:", id);
       
               
           const result = await usersCollection.deleteOne({ 
             _id: new ObjectId(id) 
           });
           
-          console.log("Delete operation result:", result);
+        //   console.log("Delete operation result:", result);
       
           if (result.deletedCount === 0) {
-            console.log("No document found with ID:", id);
+            // console.log("No document found with ID:", id);
             return res.status(404).json({
               success: false,
               message: "Food item not found"
@@ -150,7 +152,7 @@ async function run() {
           });
       
         } catch (error) {
-          console.error("Full delete error:", error);
+        //   console.error("Full delete error:", error);
           res.status(500).json({
             success: false,
             message: "Failed to delete food item",
@@ -162,9 +164,9 @@ async function run() {
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
   }
